@@ -1,12 +1,18 @@
 const User = require("../models/user.model.js");
 const ApiError = require("../utils/ApiError.js");
+const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken");
 
 const {
     generateAccessToken,
     generateRefreshToken,
 } = require("../utils/token.util.js");
 
+
 class AuthService {
+
+
+
 
     async getCurrentUser(userId){
         const user = await User.findById(userId);
@@ -16,6 +22,10 @@ class AuthService {
         return user;
     }
     
+
+
+
+
     async register(userData) {
         const {
             firstName,
@@ -45,17 +55,18 @@ class AuthService {
 
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
-
-        user.refreshToken = refreshToken;
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+        
+        user.refreshToken = hashedRefreshToken;
         user.refreshTokenExpiresAt = new Date(
             Date.now() + 7 * 24 * 60 * 60 * 1000
         );
 
         await user.save();
 
-        const userResponse = user.toObject();
+        const userResponse = user.toJSON();
         delete userResponse.auth.password;
-        delete userResponse.refreshToken;
+        // delete userResponse.refreshToken;
 
         return {
             user: userResponse,
@@ -63,6 +74,9 @@ class AuthService {
             refreshToken,
         };
     }
+
+
+
 
     async login(email, password) {
         const user = await User.findOne({
@@ -81,21 +95,25 @@ class AuthService {
 
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
-
-        user.refreshToken = refreshToken;
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+        
+        user.refreshToken = hashedRefreshToken;
         user.refreshTokenExpiresAt = new Date(
             Date.now() + 7 * 24 * 60 * 60 * 1000
         );
 
-        user.incrementLoginCount();
-        user.updateLastSeen();
+        user.loginCount += 1;
+        user.lastSeen = new Date();
         user.auth.lastLogin = new Date();
+
 
         await user.save();
 
         const userResponse = user.toObject();
         delete userResponse.auth.password;
         delete userResponse.refreshToken;
+        delete userResponse.refreshTokenExpiresAt;
+      
 
         return {
             user: userResponse,
@@ -103,6 +121,80 @@ class AuthService {
             refreshToken,
         };
     }
+
+
+
+
+
+    async refreshToken(refreshToken){
+        if(!refreshToken){
+            throw new ApiError(401,"Refresh Token missing.");
+        }
+
+        let decoded;
+        try{
+            decoded = jwt.verify(
+                refreshToken,
+                process.env.JWT_REFRESH_SECRET
+            );
+        }catch{
+            throw new ApiError(401,"Invalid or expired refresh token.");
+        }
+
+        const user = await User.findById(decoded.id).select("+refreshToken");
+        if(!user)throw new ApiError(401,"User not found.");
+
+        const isValid = await bcrypt.compare(refreshToken,user.refreshToken);
+
+        if(!isValid)throw new ApiError(401,"Invalid Refresh Token. ");
+
+        const newAccesssToken = generateAccessToken(user);
+        const newRefreshtoken = generateRefreshToken(user);
+
+        const hashedRefreshToken = await bcrypt.hash(newRefreshtoken,10);
+        user.refreshToken = hashedRefreshToken;
+
+        user.refreshTokenExpiresAt = new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000
+        );
+
+        await user.save();
+
+        return {
+            accessToken: newAccesssToken,
+            refreshToken: newRefreshtoken,
+        };
+
+    }
+
+
+
+
+
+    async logout(refreshToken){
+        if(!refreshToken)return;
+        let decoded;
+        try{
+            decoded = jwt.verify(
+                refreshToken,
+                process.env.JWT_REFRESH_SECRET
+            );
+        }catch{
+            return;
+        }
+
+
+        const user = await User.findById(decoded.id);
+
+        if(!user)return;
+        user.refreshToken = null;
+        user.refreshTokenExpiresAt : null;
+
+        await user.save();
+    }
+
+
+
 
 }
 

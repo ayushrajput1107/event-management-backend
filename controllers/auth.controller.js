@@ -24,6 +24,27 @@ class AuthController {
     // }
 
 
+    refreshToken = asyncHandler(async(req,res) => {
+        const refreshToken = req.cookies.refreshToken;
+        const tokens = await authService.refreshToken(refreshToken);
+
+        res.cookie(
+            "refreshToken",
+            tokens.refreshToken,
+            cookieOptions
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Token refreshed successfully.",
+            data: {
+                accessToken: tokens.accessToken,
+            },
+        })
+    })
+
+
+
 getCurrentUser = asyncHandler(async (req,res) => {
     const user = await authService.getCurrentUser(req.user._id);
     return res.status(200).json({
@@ -46,8 +67,10 @@ register = asyncHandler(async (req, res, next) => {
     return res.status(201).json({
         success: true,
         message: "User registered successfully.",
-        accessToken: user.accessToken,
-        data: user,
+        data: {
+            user: user.user,
+            accessToken: user.accessToken,
+        },
     });
 });
 
@@ -66,10 +89,15 @@ login = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
         success: true,
         message: "Login successful.",
-        accessToken: user.accessToken,
-        data: user,
+        data: {
+            user: user.user,
+            accessToken: user.accessToken,
+        },
     });
 });
+
+
+
 
 
 
