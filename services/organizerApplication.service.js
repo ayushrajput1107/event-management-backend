@@ -7,7 +7,7 @@ const ApiError = require("../utils/ApiError.js");
 class OrganizerApplicationService{
 
     async apply(userId, applicationData){
-        const user = User.findById(userId);
+        const user = await User.findById(userId);
 
         if(!user)throw new ApiError(401,"User not found!");
         if(user.authorization.role !== "ATTENDEE"){

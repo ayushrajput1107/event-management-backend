@@ -9,6 +9,7 @@ const authenticate = async(req,res,next) => {
         if(!authHeader || !authHeader.startsWith("Bearer ")){
             throw new ApiError(401,"Access token missing. ");
         }
+        console.log(req.headers.authorization);
 
         const token = authHeader.split(" ")[1];
 

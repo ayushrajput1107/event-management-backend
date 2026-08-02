@@ -188,7 +188,7 @@ class AuthService {
 
         if(!user)return;
         user.refreshToken = null;
-        user.refreshTokenExpiresAt : null;
+        user.refreshTokenExpiresAt = null;
 
         await user.save();
     }
