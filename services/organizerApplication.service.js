@@ -31,7 +31,19 @@ class OrganizerApplicationService{
            socialLinks: applicationData.socialLinks,
            documents: applicationData.documents,
         });
+        return application;
+    }
 
+    async getMyApplication(userId){
+        const application = await OrganizerApplication.findOne({ applicant: userId, 
+
+        }).populate( "reviewedBy",
+            "profile.firstName profile.lastName auth.email"
+        );
+
+        if(!application){
+            throw new ApiError(401,"No organizer application found.");
+        }
 
         return application;
     }
