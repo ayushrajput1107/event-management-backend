@@ -21,7 +21,7 @@ class OrganizerApplicationController{
 
     getMyApplication = asyncHandler(async (req,res) => {
         const application = await organizerApplicationService.getMyApplication(req.user._id);
-        return res.status(201).json({
+        return res.status(200).json({
             success: true,
             data: application,
         });
@@ -48,6 +48,15 @@ class OrganizerApplicationController{
             data: application,
         });
 
+    });
+
+
+    getAllApplications = asyncHandler(async (req,res) =>{
+        const applicantions = await organizerApplicationService.getAllApplications();
+        return res.status(200).json({
+            success: true,
+            data : applicantions,
+        });
     });
 
 

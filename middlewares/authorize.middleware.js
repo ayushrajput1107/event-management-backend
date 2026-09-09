@@ -9,11 +9,9 @@ const authorize = (...roles) => {
 
         const userRole = req.user.authorization.role;
 
-
         if(!roles.includes(userRole)){
             return next(new ApiError(403,"you are not authorized to perform this action."));
         }
-
 
         next();
     };

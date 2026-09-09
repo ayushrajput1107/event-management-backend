@@ -6,8 +6,7 @@ const router = express.Router();
 
 
 
-router.get("/organizer-applications",authenticate,authorize("ADMIN"),organizerApplicationController.getMyApplication);
-
+router.get("/organizer-applications",authenticate,authorize("ADMIN"),organizerApplicationController.getAllApplications);
 router.patch("/organizer-applications/:applicationId/approve",authenticate,authorize("ADMIN"),organizerApplicationController.approveApplication);
 router.patch("/organizer-applications/:applicationId/reject",authenticate,authorize("ADMIN"),organizerApplicationController.rejectApplication);
 
