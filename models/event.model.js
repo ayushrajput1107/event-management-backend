@@ -183,7 +183,7 @@ const analyticsSchema = new mongoose.Schema(
 
         registrations: {
             type: Number,
-            deafult: 0,
+            default: 0,
         },
 
         checkIns: {
