@@ -3,25 +3,27 @@ const asyncHandler = require("../utils/asyncHandler.js");
 const cookieOptions = require("../utils/cookieOptions.js");
 
 class AuthController {
-    // async register(req,res){
-    //     try{
-    //         const user = await authService.register(req.body);
-
-    //         return res.status(201).json({
-    //             success: true,
-    //             message: "User registered successfully.",
-    //             data: user
-    //         });
-    //     }
 
 
-    //     catch(error) {
-    //         return res.status(400).json({
-    //             success: false,
-    //             message: error.message
-    //         });
-    //     }
-    // }
+    async register(req,res){
+        try{
+            const user = await authService.register(req.body);
+
+            return res.status(201).json({
+                success: true,
+                message: "User registered successfully.",
+                data: user
+            });
+        }
+
+
+        catch(error) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
 
 
     refreshToken = asyncHandler(async(req,res) => {

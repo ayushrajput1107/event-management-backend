@@ -7,6 +7,13 @@ const eventController = require('../controllers/event.controller.js');
 
 
 router.post("/",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.createEvent);
+router.get("/my-events",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.getMyEvents);
+router.get("/:eventId",eventController.getEventById);
+router.patch("/:eventId",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.updateEvent);
+router.patch("/:eventId/delete",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.deleteEvent);
+router.patch("/:eventId/publish",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.publishEvent);
+router.patch("/:eventId/open-registration",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.openRegistration);
+router.patch("/:eventId/close-registration",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.closeRegistration);
 
 
 module.exports = router;
