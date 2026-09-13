@@ -2,6 +2,7 @@ const express = require('express')
 const authRoutes = require("./routes/auth.routes.js");
 const cookieParser = require("cookie-parser");
 const errorMiddleware = require("./middlewares/error.middleware.js");
+const registrationRoutes = require("./routes/registration.route.js");
 const adminRoutes = require("./routes/admin.routes.js");
 const eventRoutes = require("./routes/event.route.js");
 const organizerApplicationRoutes = require("./routes/organizerApplication.routes.js")
@@ -15,6 +16,7 @@ app.use("/api/auth",authRoutes);
 app.use("/api/organizer",organizerApplicationRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/events",eventRoutes);
+app.use("/api/registrations",registrationRoutes);
 app.use(errorMiddleware);
 
 
