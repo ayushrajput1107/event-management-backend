@@ -6,6 +6,34 @@ const asyncHandler = require("../utils/asyncHandler");
 class RegistrationController{
 
 
+    approveRegistration = asyncHandler(async (req,res) => {
+        const registration = await registrationService.approveRegistartions(
+            req.user._id,
+            req.params.registrationId
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Registration approved successfully.",
+            data: registration,
+        });
+    });
+
+
+
+    getEventRegistrations = asyncHandler(async (req,res) => { 
+        const registrations = await registrationService.getEventRegistrations(
+            req.user._id,
+            req.params.eventId,
+        );
+
+        return res.status(200).json({
+            success: true,
+            data: registrations,
+        })
+    })
+
+
     cancelRegistration = asyncHandler(async (req,res) => {
         const registration = await registrationService.cancelRegistration(
             req.user._id,

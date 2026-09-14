@@ -58,8 +58,11 @@ class RegistrationService {
             }], {session}
         );
 
-        
-        event.capacity.availableSeats -= ticketCount;
+        if(registrationStatus === "CONFIRMED"){
+            event.capacity.availableSeats -= ticketCount;
+        }
+
+    
         event.analytics.registrations += 1;
         await event.save(session);
         await session.commitTransaction();
@@ -162,6 +165,102 @@ async cancelRegistration(userId, registrationId) {
     } finally {
         await session.endSession();
     }
+}
+
+
+
+async getEventRegistrations(userId, eventId){
+    if(!mongoose.Types.ObjectId.isValid(eventId)){
+        throw new ApiError(400,"Invalid event Id");
+    }
+
+    const event = await Event.findOne({
+        _id: eventId,
+        isDeleted: false,
+    });
+
+    if(!event){
+        throw new ApiError(404,"Event not Found!");
+    }
+
+    if(event.organizer.toString() !== userId.toString()){
+        throw new ApiError(403,"you are not allowed to perform this action");
+    }
+
+    const registrations = await Registration.find({
+        event: eventId,
+    }).populate(
+        "user",
+        "profile.firstName profile.lastName auth.email"
+    ).sort({created: -1});
+
+
+    return registrations;
+}
+
+
+
+async approveRegistartions(userId, registrationId){
+    if(!mongoose.Types.ObjectId.isValid(registrationId)){
+        throw new ApiError(400,"Invalid registration ID.");
+    }
+
+    const session = await mongoose.startSession();
+
+    try{
+        session.startTransaction();
+
+        const registration = await Registration.findById(
+            registrationId
+        ).session(session);
+
+        if(!registration){
+            throw new ApiError(404,"Registartion not found!");
+        }
+
+        if(registration.status !== "PENDING"){
+            throw new ApiError(400,"Only pending registration can be approved");
+        }
+
+        const event = await Event.findOne({
+            _id: registration.event,
+            isDeleted: false,
+        }).session(session);
+
+        if(!event){
+            throw new ApiError(404,"Event not found!");
+        }
+
+        if(event.organizer.toString() !== userId.toString()){
+            throw new ApiError(403,"You are not allowed to approve registrations for this event");
+        }
+
+        if(event.capacity.availableSeats < registration.ticketCount){
+            throw new ApiError(400,"Not enough seats available to approve this registrations.");
+        }
+
+
+        registrations.status = "CONFIRMED";
+
+        await registration.save({ session });
+
+        event.capacity.availableSeats -= registration.ticketCount;
+
+        await event.save({ session });
+        await session.commitTransaction();
+
+        return registration;
+    }catch(error){
+        if(session.inTransaction()){
+            await session.abortTransaction();
+        }
+
+        throw error;
+    }finally{
+        await session.endSession();
+    }
+
+
 }
 
   
