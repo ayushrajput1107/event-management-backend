@@ -1,9 +1,9 @@
 const eventService = require("../services/event.service.js");
+const registrationService = require("../services/registration.service.js");
 const asyncHandler = require("../utils/asyncHandler.js");
 
 
 class EventController{
-
 
     closeRegistration = asyncHandler(async (req,res) => {
         const event = await eventService.closeRegistration(

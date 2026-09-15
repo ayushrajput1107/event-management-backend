@@ -260,6 +260,39 @@ async approveRegistartions(userId, registrationId){
         await session.endSession();
     }
 
+}
+
+
+async rejectRegistration(userId,registrationId,reviewNotes = ""){
+    if(!mongoose.Types.ObjectId.isValid(registrationId)){
+        throw new ApiError(400,"Invalid registration ID.");
+    }
+
+    const registration = await Registration.findById(registrationId);
+
+    if(!registration){
+        throw new ApiError(404,"Registration not found!");
+    }
+
+    if(registration.status !== "PENDING"){
+        throw new ApiError(400,"Only Pending registrations can be rejected!");
+    }
+
+    const event = await Event.findOne({
+        _id: registrationId,
+        isDeleted: false,
+    });
+
+    if(!event)throw new ApiError(404,"Event not found!");
+
+    if(event.organizer.toString() !== userId.toString())
+        throw new ApiError(403,"You are not allowed to reject registrations for this event.");
+
+    registration.status = "REJECTED";
+
+    await registration.save();
+    return registration;
+
 
 }
 

@@ -5,6 +5,22 @@ const asyncHandler = require("../utils/asyncHandler");
 
 class RegistrationController{
 
+        rejectRegistration = asyncHandler(async (req,res) => {
+            const { reviewNotes } = req.body;
+            const registration = await registrationService.rejectRegistration(
+                req.user._id,
+                req.params.registrationId,
+                reviewNotes
+            );
+    
+            return res.status(200).json({
+                success: true,
+                message: "Registrations rejected Successfully!",
+                data: registration, 
+            });
+    
+        });
+
 
     approveRegistration = asyncHandler(async (req,res) => {
         const registration = await registrationService.approveRegistartions(

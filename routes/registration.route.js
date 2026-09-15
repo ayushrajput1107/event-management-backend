@@ -9,6 +9,7 @@ router.get("/my-registrations",authenticate,registrationController.getMyRegistra
 router.patch("/:registrationId/cancel",authenticate,registrationController.cancelRegistration);
 router.get("/event/:eventId",authenticate,authorize("VERIFIED_ORGANIZER"),registrationController.getEventRegistrations);
 router.patch("/:registrationId/approve",authenticate,authorize("VERIFIED_ORGANIZER"),registrationController.approveRegistration);
+router.patch("/registrationId/reject",authenticate,authorize("VERIFIED_ORGANIZER"),registrationController.rejectRegistration);
 
 
 module.exports = router;
