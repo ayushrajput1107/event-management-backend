@@ -14,6 +14,7 @@ router.patch("/:eventId/delete",authenticate,authorize("VERIFIED_ORGANIZER"),eve
 router.patch("/:eventId/publish",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.publishEvent);
 router.patch("/:eventId/open-registration",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.openRegistration);
 router.patch("/:eventId/close-registration",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.closeRegistration);
+router.patch("/:eventId/start",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.startEvent);
 
 
 module.exports = router;

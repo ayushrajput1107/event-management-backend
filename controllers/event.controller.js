@@ -5,6 +5,21 @@ const asyncHandler = require("../utils/asyncHandler.js");
 
 class EventController{
 
+
+    startEvent = asyncHandler(async (req,res) => {
+        
+        const event = await eventService.startEvent(
+            req.user._id,
+            req.params.eventId
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Event started successfully",
+            data: event,
+        })
+    })
+
     closeRegistration = asyncHandler(async (req,res) => {
         const event = await eventService.closeRegistration(
             req.user._id,

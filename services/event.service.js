@@ -6,6 +6,41 @@ const ApiError = require("../utils/ApiError.js");
 class EventService{
 
 
+    async startEvent(userId,eventId){
+        if(!mongoose.Types.ObjectId.isValid(eventId)){
+            throw new ApiError(400,"Invalid Event ID!");
+        }
+
+        const event = await Event.findOne({
+         _id: eventId,
+         isDeleted: false,
+        })
+
+        if(!event){
+            throw new ApiError(404,"Event not found!");
+        }
+
+        if(event.organizer.toString() !== userId.toString()){
+            throw new ApiError(403,"you are not allowed to perform this action!");
+        }
+
+        if(event.status !== "REGISTRATION_CLOSED"){
+            throw new ApiError(400,"Only events with closed registrations can be started");
+        }
+
+        const now = new Date();
+
+        // if(now < event.schedule.startDate){
+        //     throw new ApiError(400,"Event start time is not reached!");
+        // }
+
+        event.status = "ONGOING";
+
+        await event.save();
+        return event;
+    }
+
+
     async closeRegistration(userId, eventId){
         if(!mongoose.Types.ObjectId.isValid(eventId)){
             throw new ApiError(400,"Invalid event ID.");
