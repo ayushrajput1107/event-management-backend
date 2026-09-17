@@ -15,6 +15,7 @@ router.patch("/:eventId/publish",authenticate,authorize("VERIFIED_ORGANIZER"),ev
 router.patch("/:eventId/open-registration",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.openRegistration);
 router.patch("/:eventId/close-registration",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.closeRegistration);
 router.patch("/:eventId/start",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.startEvent);
+router.patch("/:eventId/complete",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.completeEvent);
 
 
 module.exports = router;

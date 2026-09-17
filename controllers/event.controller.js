@@ -6,6 +6,20 @@ const asyncHandler = require("../utils/asyncHandler.js");
 class EventController{
 
 
+    completeEvent = asyncHandler(async(req,res) => {
+        const event = await eventService.completeEvent(
+            req.user._id,
+            req.params.eventId
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Event completed successfully!",
+            data: event,
+        });
+    })
+
+
     startEvent = asyncHandler(async (req,res) => {
         
         const event = await eventService.startEvent(

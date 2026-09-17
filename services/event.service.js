@@ -6,6 +6,39 @@ const ApiError = require("../utils/ApiError.js");
 class EventService{
 
 
+    async completeEvent(userId,eventId){
+        if(!mongoose.Types.ObjectId.isValid(eventId)){
+            throw new ApiError(400,"Invalid event Id.")
+        }
+        const event = await Event.findOne({
+            _id: eventId,
+            isDeleted: false,
+        });
+
+        if(!event){
+            throw new ApiError(404,"Event not found!");
+        }
+
+        if(event.organizer.toString() !== userId.toString()){
+            throw new ApiError(403,"You are not allowed to complete this action!")
+        }
+
+        if(event.status !== "ONGOING"){
+            throw new ApiError(400,"only ongoing events can be completed!");
+        }
+        const now = new Date();
+
+        if(now < event.schedule.endDate){
+            throw new ApiError(400,"Event end time has not been reached yet");
+        }
+
+
+        event.status = "COMPLETED";
+        await event.save();
+        return event;
+    }
+
+
     async startEvent(userId,eventId){
         if(!mongoose.Types.ObjectId.isValid(eventId)){
             throw new ApiError(400,"Invalid Event ID!");
