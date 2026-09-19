@@ -6,6 +6,7 @@ const authorize = require("../middlewares/authorize.middleware.js");
 const eventController = require('../controllers/event.controller.js');
 
 
+router.get("/",eventController.getPublicEvents);
 router.post("/",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.createEvent);
 router.get("/my-events",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.getMyEvents);
 router.get("/:eventId",eventController.getEventById);
@@ -16,6 +17,5 @@ router.patch("/:eventId/open-registration",authenticate,authorize("VERIFIED_ORGA
 router.patch("/:eventId/close-registration",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.closeRegistration);
 router.patch("/:eventId/start",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.startEvent);
 router.patch("/:eventId/complete",authenticate,authorize("VERIFIED_ORGANIZER"),eventController.completeEvent);
-
 
 module.exports = router;

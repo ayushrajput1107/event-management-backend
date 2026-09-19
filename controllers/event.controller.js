@@ -5,6 +5,14 @@ const asyncHandler = require("../utils/asyncHandler.js");
 
 class EventController{
 
+    getPublicEvents = asyncHandler(async (req,res) => {
+        const events = await eventService.getPublicEvents();
+        return res.status(200).json({
+            success: true,
+            data: events
+        });
+    });
+
 
     completeEvent = asyncHandler(async(req,res) => {
         const event = await eventService.completeEvent(

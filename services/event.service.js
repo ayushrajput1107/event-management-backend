@@ -5,6 +5,24 @@ const ApiError = require("../utils/ApiError.js");
 
 class EventService{
 
+    async getPublicEvents(){
+        const events = await Event.find({
+            isDeleted:false,
+            status:{
+                $in: [
+                    "PUBLISHED",
+                    "REGISTRATION_OPEN"
+                ]
+            }
+        }).populate(
+            "organizer",
+            "profile.firstName profile.lastName"
+        ).sort({created: -1});
+
+
+        return events;
+    }
+
 
     async completeEvent(userId,eventId){
         if(!mongoose.Types.ObjectId.isValid(eventId)){
